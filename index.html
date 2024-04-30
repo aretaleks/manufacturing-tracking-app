@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUT App</title>
+    <script src="frontend.js" defer></script>
+    <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="jquery-ui-1.12.1.custom/jquery-ui.css">
+    <script src="jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+</head>
+
+<body>
+    <div class="row">
+        <input type="text" id="pdfInput" placeholder="Sisesta tellimuse nr">
+        <button id="openPdf">Ava tellimuse PDF</button>
+        <input type="text" id="drawingInput" placeholder="Sisesta tellimuse nr">
+        <button id="openDrw">Ava joonised</button>
+        <button id="openFilters">Filtrid</button>
+    </div>
+    <div class="row">
+        <div class="tableWrap" id="tableContainer"></div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="datePickerContainer">
+                <div id="datepicker"></div>
+                <p id="selectedDateText">
+                    Valitud kuupäev: <span id="selectedDate"></span>
+                </p>
+            </div>
+        </div>
+        <div class="column">
+            <form class="form-row">
+                <div class="form-column">
+                    <label for="pink-select">Pink</label>
+                    <select name="pink" id="pink-select" required tabindex="1">
+                        <option value="">Vali pink</option>
+                    </select>
+                    <label for="toode-select">Toode</label>
+                    <input list="toode-list" name="toode" id="toode-select" placeholder="Sisesta toode" required
+                        tabindex="5">
+                    <datalist id="toode-list">
+                        <option value="">Sisesta toode</option>
+                    </datalist>
+                    <label for="klient-field">Klient</label>
+                    <input type="text" id="klient-field" name="klient" placeholder="Sisesta klient" required
+                        tabindex="9">
+                </div>
+                <div class="form-column">
+                    <label for="operaator-select">Operaator</label>
+                    <select name="operaator" id="operaator-select" required tabindex="2">
+                        <option value="">Vali operaator</option>
+                    </select>
+                    <label for="kogus-field">Kogus</label>
+                    <input type="text" id="kogus-field" name="kogus" placeholder="Sisesta kogus" required tabindex="6">
+                    <button type="button" id="tellimus-submit" tabindex="10">Hangi klient</button>
+                </div>
+                <div class="form-column">
+                    <label for="tellimus-field">Tellimus</label>
+                    <input type="text" id="tellimus-field" name="tellimus" placeholder="Sisesta tellimus" required
+                        tabindex="3">
+                    <label for="kasi-select">Käsi</label>
+                    <select name="kasi" id="kasi-select" required tabindex="7">
+                        <option value="">Vali käsi</option>
+                        <option value="V">V</option>
+                        <option value="P">P</option>
+                    </select>
+                    <button type="button" id="form-clear" tabindex="11">Tühjenda</button>
+                </div>
+                <div class="form-column">
+                    <label for="pos-field">Pos</label>
+                    <input type="text" id="pos-field" name="pos" placeholder="Sisesta positsioon" required tabindex="4">
+                    <label for="operatsioon-select">Operatsioon</label>
+                    <select name="operatsioon" id="operatsioon-select" required tabindex="8">
+                        <option value="">Vali operatsioon</option>
+                    </select>
+                    <button type="submit" id="form-submit" tabindex="12">Salvesta</button>
+                </div>
+                <input type="hidden" id="selectedDateInput" name="selectedDateInput">
+            </form>
+        </div>
+    </div>
+
+    <div id="filterModal" class="modal">
+        <div class="modal-content">
+            <form id="filterForm">
+                <div class="form-group">
+                    <label for="filterDate">Kuupäev:</label>
+                    <input type="date" id="filterDate" name="filterDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="filterTellimus">Tellimus:</label>
+                    <input type="text" id="filterTellimus" name="filterTellimus">
+                </div>
+
+                <div class="form-group">
+                    <label for="filterOperaator">Operaator:</label>
+                    <input type="text" id="filterOperaator" name="filterOperaator">
+                </div>
+
+                <div class="form-group">
+                    <label for="filterKlient">Klient:</label>
+                    <input type="text" id="filterKlient" name="filterKlient">
+                </div>
+
+                <img src="close_icon.svg" alt="Close" title="Sule aken" id="closeButton">
+                <button type="button" id="applyFilters">Rakenda filter</button>
+                <button type="button" id="resetFilters">Lähtesta filter</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        #pdfInput,
+        #drawingInput {
+            margin-right: 1rem;
+            transform: translateY(+3px);
+        }
+
+        #openPdf,
+        #openDrw {
+            margin-right: 3rem;
+        }
+
+        #openFilters {
+            margin-left: 2rem;
+        }
+
+        .tableWrap {
+            height: 400px;
+            width: 1200px;
+            overflow-y: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: row;
+
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            margin-right: 2rem;
+        }
+
+        label {
+            font-size: larger;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        select,
+        input {
+            margin-bottom: 2.5rem;
+            padding: 5px;
+            height: 25px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        select {
+            height: 37px;
+        }
+
+        .row {
+            display: flex;
+            align-items: left;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            margin-right: 2rem;
+            margin-top: 2rem;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 50px;
+        }
+
+        p {
+            font-size: larger;
+        }
+
+        #form-submit,
+        #form-clear,
+        #tellimus-submit {
+            margin-top: 1.6rem;
+        }
+
+        div.ui-datepicker {
+            font-size: 18px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 700px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 10px;
+            margin-left: 2rem;
+        }
+
+        .form-group:first-child {
+            margin-top: 3rem;
+        }
+
+        .form-group label {
+            flex: 1;
+            margin-right: 10px;
+            text-align: left;
+        }
+
+        .form-group input {
+            flex: 3;
+            padding: 5px;
+            height: 25px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 15rem;
+        }
+
+        #closeButton {
+            transition: 0.3s;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            cursor: pointer;
+        }
+
+        #closeButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 7px rgba(33, 33, 33, 0.3);
+        }
+
+        button {
+            display: inline-block;
+            outline: 0;
+            border: 0;
+            cursor: pointer;
+            background: #FCFCFD;
+            box-shadow: 0px 2px 4px rgba(45, 35, 66, 0.4), 0px 7px 13px -3px rgba(45, 35, 66, 0.3), inset 0px -3px 0px #d6d6e7;
+            height: 40px;
+            padding: 0 32px;
+            font-size: 18px;
+            border-radius: 6px;
+            color: #36395a;
+            transition: box-shadow 0.15s ease, transform 0.15s ease;
+        }
+
+        button:hover {
+            box-shadow: 0px 4px 8px rgba(45, 35, 66, 0.4), 0px 7px 13px -3px rgba(45, 35, 66, 0.3), inset 0px -3px 0px #d6d6e7;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            box-shadow: inset 0px 3px 7px #d6d6e7;
+            transform: translateY(2px);
+        }
+
+
+        #applyFilters {
+            position: absolute;
+            top: 8rem;
+            right: 3rem;
+        }
+
+        #resetFilters {
+            position: absolute;
+            top: 15rem;
+            right: 3rem;
+        }
+    </style>
+    <script>
+        $(function () {
+            const currentDate = new Date();
+            const formattedCurrentDate = $.datepicker.formatDate("dd-mm-yy", currentDate);
+            const formattedInputDate = $.datepicker.formatDate("yy-mm-dd", currentDate);
+            $("#selectedDate").text(formattedCurrentDate);
+            $("#selectedDateInput").val(formattedInputDate);
+            $("#datepicker").datepicker({
+                dateFormat: "yy-mm-dd",
+                firstDay: 1,
+                defaultDate: currentDate,
+                onSelect: function (dateText) {
+                    const formattedDateText = $.datepicker.formatDate("dd-mm-yy", new Date(dateText));
+                    $("#selectedDate").text(formattedDateText);
+                    $("#selectedDateInput").val(dateText);
+                }
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>
