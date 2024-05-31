@@ -14,9 +14,9 @@ later used in Power BI for analytics.
 There's a functionality to automatically get the client's name based on the order number.
 The information is pulled from the CRM API.
 
-##### Main UI:
+#### Main UI:
 ![image](https://github.com/aretaleks/manufacturing-tracking-app/assets/31519197/01676b1a-9069-41cc-91ac-01b3310804ba)
 
-##### Filters UI view:
+#### Filters UI view:
 ![image](https://github.com/aretaleks/manufacturing-tracking-app/assets/31519197/5ff97b9b-5c13-4e10-bbdf-8c99f04754f3)
 
