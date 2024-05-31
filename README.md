@@ -1,3 +1,6 @@
+Manufacturing Tracking App
+--------------------------
+
 This is a web application that I made for an Estonian wooden door manufacturing company.
 One of the main requirements was that it needed to run on older browsers like Chrome version 49.
 Considering that and my small knowledge of application building I decided to use a basic stack.
